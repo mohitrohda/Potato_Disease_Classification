@@ -1,0 +1,12 @@
+# Ignore dataset
+training/dataset
+training/dateset_full
+training/PlantVillage
+
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore virtual environment
+venv/
