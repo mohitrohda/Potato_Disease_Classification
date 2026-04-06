@@ -16,7 +16,13 @@ app.add_middleware(
 )
 
 
-MODEL = tf.keras.models.load_model("saved_models/2.h5", compile=False, safe_mode=False)
+MODEL = None
+
+def load_model():
+    global MODEL
+    if MODEL is None:
+        MODEL = tf.keras.models.load_model("saved_models/model.h5")
+    return MODEL
 
 CLASS_NAMES = ['Apple___Apple_scab',
  'Apple___Black_rot',
