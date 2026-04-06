@@ -59,11 +59,13 @@ async def home():
 @app.post('/predict')
 async def predict(file: UploadFile = File(...)):
 
+    model = load_model()
+
     image = read_file_as_img(await file.read())
 
     image_batch = np.expand_dims(image, 0)
 
-    predictions = MODEL.predict(image_batch)
+    predictions = model.predict(image_batch)
 
     predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
     confidence = np.max(predictions[0])
