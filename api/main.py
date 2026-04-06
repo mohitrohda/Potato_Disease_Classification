@@ -49,7 +49,9 @@ CLASS_NAMES = ['Apple___Apple_scab',
  'Tomato_healthy']
 
 def read_file_as_img(data) -> np.ndarray:
-    image = np.array(Image.open(BytesIO(data)))
+    image = Image.open(BytesIO(data)).convert("RGB")  # important
+    image = image.resize((128, 128))  # match your training size
+    image = np.array(image) / 255.0
     return image
 
 @app.get('/')
@@ -58,19 +60,29 @@ async def home():
 
 @app.post('/predict')
 async def predict(file: UploadFile = File(...)):
+    try:
+        print("Request received")
 
-    model = load_model()
+        model = load_model()
+        print("Model loaded")
 
-    image = read_file_as_img(await file.read())
+        image = read_file_as_img(await file.read())
+        print("Image shape:", image.shape)
 
-    image_batch = np.expand_dims(image, 0)
+        image_batch = np.expand_dims(image, 0)
+        print("Batch shape:", image_batch.shape)
 
-    predictions = model.predict(image_batch)
+        predictions = model.predict(image_batch)
+        print("Prediction done")
 
-    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
-    confidence = np.max(predictions[0])
+        predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
+        confidence = np.max(predictions[0])
 
-    return {
-        'class': predicted_class,
-        'confidence': float(confidence)
+        return {
+            'class': predicted_class,
+            'confidence': float(confidence)
         }
+
+    except Exception as e:
+        print("ERROR:", e)
+        return {"error": str(e)}
